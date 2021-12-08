@@ -412,7 +412,7 @@ class PenaltyViewTest2(TestCase):
             "/charges/penalty", json.dumps(data), content_type="application/json", **header
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json(), {"message": "SUCCESS"})
 
     def test_post_penalty_unauthorized_error(self):
