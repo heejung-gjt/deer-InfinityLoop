@@ -273,7 +273,8 @@ http://3.38.118.39:8000/charges/discount
 {
     "code": "D-P-1",
     "number": 30,
-    "description": "주차존 반납"
+    "description": "주차구역 반납",
+    "unit": "%"
 }
 ```
 
@@ -313,8 +314,9 @@ http://3.38.118.39:8000/charges/penalty
 ```
 {
     "code": "P-A-1",
-    "number": 6000,
-    "description": "서비스 지역 이탈 요금 부과"
+    "number": 10000,
+    "description": "서비스 지역 이탈 요금 부과",
+    "unit": "원"
 }
 ```
 
@@ -357,7 +359,7 @@ http://3.38.118.39:8000/charges/discount/D-P-1
 ```
 {
     "number" : 20,
-    "description" : "주차존 반납"
+    "description" : "주차구역 반납"
 }
 ```
 
@@ -397,7 +399,7 @@ http://3.38.118.39:8000/charges/penalty/P-A-1
 
 ```
 {
-    "number" : 10000,
+    "number" : 6000,
     "description" : "서비스 지역 이탈 요금 부과"
 }
 ```
@@ -523,7 +525,7 @@ http://3.38.118.39:8000/areas/service/b1d96ffe56cd441bb12e789199f419de
 
 ```
 {
-    "name": "신도림_1",
+    "name": "신도림_3",
     "boundary": [
         [
             126.88183307647704,
@@ -559,9 +561,9 @@ http://3.38.118.39:8000/areas/service/b1d96ffe56cd441bb12e789199f419de
         37.5091695751726
     ],
     "code": [
-        "D-P-1",
-        "P-A-1",
-        "P-P-1"
+        "D-P-5",
+        "P-A-3",
+        "P-P-2"
     ]
 }
 ```
@@ -572,7 +574,7 @@ http://3.38.118.39:8000/areas/service/b1d96ffe56cd441bb12e789199f419de
 
 ```
 {
-  "message": "신도림_1 has created!"
+  "message": "신도림_1_ALREADY_REGISTERED"
 }
 
 ```
@@ -603,9 +605,8 @@ http://3.38.118.39:8000/areas/service
 
 ```
 {
-    "code": "D-P-1",
-    "region": "신도림_1"
-}
+    "code": "P-P-7",
+    "region": "강남"
 
 ```
 
@@ -645,8 +646,8 @@ http://3.38.118.39:8000/areas/service
 
 ```
 {
-    "code": "D-P-1",
-    "region": "신도림_1"
+    "region" : "신도림_1",
+    "code" : "D-P-1"
 }
 ```
 
