@@ -5,31 +5,36 @@ from django.views    import View
 from django.db.utils import IntegrityError
 
 from users.models    import Role
-from charges.models  import Unit, Type, DiscountOrPenalties
+from charges.models  import Type, DiscountOrPenalties
+from core.mixin      import DPMixin
 from core.utils      import login_decorator
-from core.validation import code_validator
+from core.validation import check_admin
 
 
-class DiscountView(View):
+class DiscountView(DPMixin, View):
     @login_decorator
     def post(self, request):
         try:
-            if request.user.role_id != Role.Type.ADMIN.value:
+            valid_admin = check_admin(request.user.role_id)
+            
+            if valid_admin["error"]:
                 return JsonResponse({"message": "UNAUTHORIZED"}, status=401)
 
-            data = json.loads(request.body)
+            data   = json.loads(request.body)
             number = int(data["number"])
 
-            if not code_validator("D", data["code"]):
+            valid_code =  self.valid_code("D", data["code"])
+            
+            if valid_code["error"]:
                 return JsonResponse({"message": "INVALID_CODE_FORMAT"}, status=401)
 
-            DiscountOrPenalties.objects.create(
-                    id         =data["code"],
-                    number     =number,
-                    description=data["description"],
-                    unit       =Unit.objects.get(name="%"),
-                    type_id    =Type.Type.DISCOUNT.value
-                )
+            valid_unit = self.valid_unit(data["unit"])
+
+            if valid_unit["error"]:
+                return JsonResponse({"message": "UNIT_NOT_EXIST"}, status=404)
+            
+            type   = Type.Type.DISCOUNT.value
+            result = self.create_dp(data, number, type)
 
             return JsonResponse({"message": "SUCCESS"}, status=201)
 
@@ -45,8 +50,6 @@ class DiscountView(View):
         except ValueError:
             return JsonResponse({"message": "VALUE_ERROR"}, status=400)
 
-        except Unit.DoesNotExist:
-            return JsonResponse({"message": "UNIT_NOT_EXIST"}, status=404) 
     
     @login_decorator
     def put(self, request, discount_id):
@@ -79,28 +82,32 @@ class DiscountView(View):
             return JsonResponse({"message": "VALUE_ERROR"}, status=400)
 
 
-class PenaltyView(View):
+class PenaltyView(DPMixin, View):
     @login_decorator
     def post(self, request):
         try:
-            if request.user.role_id != Role.Type.ADMIN.value:
+            valid_admin = check_admin(request.user.role_id)
+            
+            if valid_admin["error"]:
                 return JsonResponse({"message": "UNAUTHORIZED"}, status=401)
 
-            data = json.loads(request.body)
+            data   = json.loads(request.body)
             number = int(data["number"])
 
-            if not code_validator("P", data["code"]):
+            valid_code =  self.valid_code("P", data["code"])
+
+            if valid_code["error"]:
                 return JsonResponse({"message": "INVALID_CODE_FORMAT"}, status=401)
 
-            DiscountOrPenalties.objects.create(
-                    id         =data["code"],
-                    number     =number,
-                    description=data["description"],
-                    unit       =Unit.objects.get(name="원"),
-                    type_id    =Type.Type.PENALTY.value
-                )
+            valid_unit = self.valid_unit(data["unit"])
 
-            return JsonResponse({"message": "SUCCESS"}, status=200)
+            if valid_unit["error"]:
+                return JsonResponse({"message": "UNIT_NOT_EXIST"}, status=404)
+
+            type   = Type.Type.PENALTY.value
+            result = self.create_dp(data, number, type)
+
+            return JsonResponse({"message": "SUCCESS"}, status=201)
 
         except IntegrityError:
             return JsonResponse({"message": "DUPLICATE_DATA"}, status=409)
@@ -113,9 +120,6 @@ class PenaltyView(View):
 
         except ValueError:
             return JsonResponse({"message": "VALUE_ERROR"}, status=400)
-
-        except Unit.DoesNotExist:
-            return JsonResponse({"message": "UNIT_NOT_EXIST"}, status=404) 
 
     @login_decorator
     def put(self, request, penalty_id):

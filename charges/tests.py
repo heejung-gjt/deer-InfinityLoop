@@ -45,7 +45,7 @@ class DiscountViewTest(TestCase):
 
     def tearDown(self):
         DiscountOrPenalties.objects.all().delete()
-        Unit.objects.all().del다ete()
+        Unit.objects.all().delete()
         Type.objects.all().delete()
         User.objects.all().delete()
         Role.objects.all().delete()
@@ -56,7 +56,8 @@ class DiscountViewTest(TestCase):
         data = {
             "code"       : "D-P-1",
             "number"     : 10,
-            "description": "올바른 주차장에 주차했을시 할인율"
+            "description": "올바른 주차장에 주차했을시 할인율",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -72,7 +73,8 @@ class DiscountViewTest(TestCase):
         data = {
             "code"       : "D-P-1",
             "number"     : 10,
-            "description": "올바른 주차장에 주차했을시 할인율"
+            "description": "올바른 주차장에 주차했을시 할인율",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -88,7 +90,8 @@ class DiscountViewTest(TestCase):
         data = {
             "code"       : "A-P-1",
             "number"     : 10,
-            "description": "올바른 주차장에 주차했을시 할인율"
+            "description": "올바른 주차장에 주차했을시 할인율",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -104,7 +107,8 @@ class DiscountViewTest(TestCase):
         data = {
             "code"       : 9,
             "number"     : 10,
-            "description": "올바른 주차장에 주차했을시 할인율"
+            "description": "올바른 주차장에 주차했을시 할인율",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -117,7 +121,7 @@ class DiscountViewTest(TestCase):
     def test_post_discount_key_error(self):
         header = {"HTTP_Authorization": f"Bearer {self.admin_token}"}
 
-        data = {"code": "D-P-3", "description": "올바른 주차장에 주차했을시 할인율"}
+        data = {"code": "D-P-3", "description": "올바른 주차장에 주차했을시 할인율", "unit": "%"}
 
         response = self.client.post(
             "/charges/discount", json.dumps(data), content_type="application/json", **header
@@ -132,7 +136,8 @@ class DiscountViewTest(TestCase):
         data = {
             "code"       : "D-P-1",
             "number"     : "",
-            "description": "올바른 주차장에 주차했을시 할인율"
+            "description": "올바른 주차장에 주차했을시 할인율",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -223,27 +228,6 @@ class DiscountViewTest(TestCase):
         self.assertEqual(
             response.json(),
             {"message": "KEY_ERROR"}
-        )
-
-    def test_put_discount_value_error(self):
-        header = {"HTTP_Authorization": f"Bearer {self.admin_token}"}
-
-        data = {
-            "number" : "abc",
-            "description" : "할인율 변경"
-        }
-
-        response = self.client.put(
-            "/charges/discount/1",
-            json.dumps(data),
-            content_type="application/json",
-            **header
-            )
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json(),
-            {"message": "VALUE_ERROR"}
         )
 
 
@@ -374,27 +358,6 @@ class PenaltyViewTest1(TestCase):
             {"message": "KEY_ERROR"}
         )
 
-    def test_put_penalty_value_error(self):
-        header = {"HTTP_Authorization": f"Bearer {self.admin_token}"}
-
-        data = {
-            "number" : "abc",
-            "description" : "반납 금지 지역 반납"
-        }
-
-        response = self.client.put(
-            "/charges/penalty/1",
-            json.dumps(data),
-            content_type="application/json",
-            **header
-            )
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json(),
-            {"message": "VALUE_ERROR"}
-        )
-
 
 class PenaltyViewTest2(TestCase):
     def setUp(self):
@@ -441,7 +404,8 @@ class PenaltyViewTest2(TestCase):
         data = {
             "code": "P-P-1",
             "number": 1000,
-            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액"
+            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액",
+            "unit"       : "원"
         }
 
         response = self.client.post(
@@ -457,7 +421,8 @@ class PenaltyViewTest2(TestCase):
         data = {
             "code": "P-P-1",
             "number": 1000,
-            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액"
+            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액",
+            "unit"       : "원"
         }
 
         response = self.client.post(
@@ -473,7 +438,8 @@ class PenaltyViewTest2(TestCase):
         data = {
             "code": "O-P-1",
             "number": 1000,
-            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액"
+            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액",
+            "unit"       : "원"
         }
 
         response = self.client.post(
@@ -488,8 +454,9 @@ class PenaltyViewTest2(TestCase):
 
         data = {
             "code": 1,
-            "number": 1000,
-            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액"
+            "number": 10,
+            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액",
+            "unit"       : "%"
         }
 
         response = self.client.post(
@@ -517,7 +484,8 @@ class PenaltyViewTest2(TestCase):
         data = {
             "code"       : "P-P-3",
             "number"     : "",
-            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액"
+            "description": "올바르지 않은 주차구역에 주차했을시 벌금금액",
+            "unit"       : "원"
         }
 
         response = self.client.post(
